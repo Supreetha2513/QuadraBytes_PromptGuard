@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptGuard Studio - LLM Security Gateway</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Opening Animation -->
+    <div class="opening-animation" id="openingAnimation">
+        <!-- Background Elements -->
+        <div class="matrix-rain" id="matrixRain"></div>
+        <div class="scan-line"></div>
+        <div class="security-grid"></div>
+        <div class="data-nodes">
+            <div class="data-node"></div>
+            <div class="data-node"></div>
+            <div class="data-node"></div>
+            <div class="data-node"></div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="opening-content">
+            <div class="security-shield">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h1 class="opening-title">
+                <span class="og-part og-left">PROMPT</span>
+                <span class="og-part og-mid">GUARD</span>
+            </h1>
+            <p class="opening-subtitle">LLM Security Gateway</p>
+            <div class="opening-decor">
+            </div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container" style="display: none;">
+        <!-- Background Particles -->
+        <div class="bg-particles" id="bgParticles"></div>
+        
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>PromptGuard</h1>
+                        <p class="logo-subtitle">Security Gateway</p>
+                    </div>
+                </div>
+                <button class="sidebar-collapse-toggle" id="sidebarToggle" title="Minimize Sidebar">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active">
+                        <a href="index.html" class="nav-link">
+                            <div class="nav-icon">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <span class="nav-text">Dashboard</span>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="index.html" class="nav-link">
+                            <div class="nav-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <span class="nav-text">Models</span>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link">
+                            <div class="nav-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <span class="nav-text">Analytics</span>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="version-info">
+                    <span>v2.0</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Hamburger Toggle for Mobile -->
+            <button class="hamburger-toggle" id="hamburgerToggle" title="Toggle Sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <!-- Header -->
+            <header class="main-header">
+                <div class="header-content">
+                    <h2 class="header-title">Model Selection</h2>
+                    <p class="header-subtitle">Choose your protected LLM interface</p>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <!-- Hero Section -->
+                <section class="hero-section">
+                    <div class="hero-content">
+                        <h1 class="hero-title">
+                            <span class="hero-gradient">PROMPTGUARD</span>
+                            <br>
+                            <span class="hero-subtitle">LLM Security Gateway</span>
+                        </h1>
+                        <p class="hero-description">
+                            Advanced multi-phase security for Large Language Models
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Models Grid -->
+                <section class="models-section">
+                    <div class="models-grid">
+                        <!-- Text Model -->
+                        <div class="model-card" data-model="text">
+                            <div class="model-card-inner">
+                                <div class="model-card-header">
+                                    <div class="model-icon">
+                                        <i class="fas fa-keyboard"></i>
+                                        <div class="icon-glow"></div>
+                                    </div>
+                                    <div class="model-badge">
+                                        <span class="badge-text">AI Protected</span>
+                                    </div>
+                                </div>
+                                <div class="model-card-body">
+                                    <h4>Text Model</h4>
+                                    <p class="model-description">
+                                        Standard LLM interface with comprehensive security layers
+                                    </p>
+                                    <div class="model-features">
+                                        <span class="feature-tag">
+                                            <i class="fas fa-check"></i>
+                                            Phase 1-3 Protection
+                                        </span>
+                                        <span class="feature-tag">
+                                            <i class="fas fa-check"></i>
+                                            Real-time Monitoring
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="model-card-footer">
+                                    <button class="btn btn-primary launch-btn">
+                                        <i class="fas fa-terminal"></i>
+                                        Launch Chat
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Image Model -->
+                        <div class="model-card" data-model="image">
+                            <div class="model-card-inner">
+                                <div class="model-card-header">
+                                    <div class="model-icon">
+                                        <i class="fas fa-image"></i>
+                                        <div class="icon-glow"></div>
+                                    </div>
+                                    <div class="model-badge">
+                                        <span class="badge-text">Vision AI</span>
+                                    </div>
+                                </div>
+                                <div class="model-card-body">
+                                    <h4>Image Model</h4>
+                                    <p class="model-description">
+                                        Multimodal vision-language model with security
+                                    </p>
+                                    <div class="model-features">
+                                        <span class="feature-tag">
+                                            <i class="fas fa-check"></i>
+                                            Image Analysis
+                                        </span>
+                                        <span class="feature-tag">
+                                            <i class="fas fa-check"></i>
+                                            Steganography Scan
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="model-card-footer">
+                                    <button class="btn btn-primary launch-btn">
+                                        <i class="fas fa-eye"></i>
+                                        Launch Vision
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Security Layers Preview -->
+                <section class="security-preview">
+                    <div class="section-header">
+                        <h3><i class="fas fa-shield-alt"></i> Security Layers</h3>
+                    </div>
+                    
+                    <div class="layers-flow">
+                        <div class="layer-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Ingress Defense</h4>
+                                <p>Pre-LLM attack prevention</p>
+                            </div>
+                        </div>
+                        <div class="step-arrow">→</div>
+                        <div class="layer-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Egress Defense</h4>
+                                <p>Output validation & sanitization</p>
+                            </div>
+                        </div>
+                        <div class="step-arrow">→</div>
+                        <div class="layer-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Governance</h4>
+                                <p>Monitoring & forensics</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

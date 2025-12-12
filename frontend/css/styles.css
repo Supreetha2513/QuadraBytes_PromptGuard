@@ -1,0 +1,307 @@
+/* Base Styles - Dark Mode */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #0a1929 0%, #1a1a2e 100%);
+    color: #e2e8f0;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Color Variables */
+:root {
+    --teal-1: #006F70;
+    --teal-2: #006A75;
+    --blue-1: #005F78;
+    --blue-2: #00547A;
+    --blue-3: #21485E;
+    --blue-4: #253D52;
+    --navy-1: #2A3247;
+    --navy-2: #2F273C;
+    --purple-1: #361F3F;
+    --purple-2: #3E1846;
+    --purple-3: #4A134F;
+    --purple-4: #541057;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--blue-1), var(--purple-1));
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--blue-2), var(--purple-2));
+}
+
+/* Selection */
+::selection {
+    background: rgba(102, 126, 234, 0.3);
+    color: #ffffff;
+}
+
+/* Common Components */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    background: linear-gradient(135deg, var(--blue-1), var(--blue-3));
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--purple-1), var(--purple-3));
+    box-shadow: 0 4px 15px rgba(84, 16, 87, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(84, 16, 87, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, var(--blue-4), var(--navy-1));
+    color: #cbd5e1;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, var(--blue-3), var(--navy-2));
+    transform: translateY(-2px);
+}
+
+.btn-icon {
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #cbd5e1;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-icon:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.btn-disabled {
+    background: rgba(255, 255, 255, 0.05);
+    color: #64748b;
+    cursor: not-allowed;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.btn-disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Status Colors */
+.safe {
+    color: #10b981;
+}
+
+.warning {
+    color: #f59e0b;
+}
+
+.danger {
+    color: #ef4444;
+}
+
+.idle {
+    color: #94a3b8;
+}
+
+/* Status backgrounds */
+.status-bg-safe {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-bg-warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.status-bg-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.status-bg-idle {
+    background: rgba(148, 163, 184, 0.1);
+    color: #94a3b8;
+    border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+/* Glow effects */
+.glow-safe {
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.glow-warning {
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+.glow-danger {
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-header {
+    padding: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(90deg, var(--blue-1), var(--purple-1));
+    border-radius: 16px 16px 0 0;
+}
+
+.modal-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 20px;
+    background: linear-gradient(90deg, #ffffff, #e2e8f0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: #cbd5e1;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+/* Sidebar opener floating button (used by index and chat pages) */
+.sidebar-opener {
+    position: fixed;
+    left: 12px;
+    top: 12px;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(0,111,112,0.95), rgba(84,16,87,0.95));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 12000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.2s ease;
+}
+
+.sidebar-opener i {
+    font-size: 16px;
+    transform: rotate(0deg);
+    transition: transform 0.2s ease;
+}
+
+.sidebar-opener:hover {
+    transform: translateY(-2px);
+    opacity: 0.98;
+}
+
+/* When sidebar is expanded we won't show the opener (removed by JS), but keep fallback */
+@media (max-width: 768px) {
+    .sidebar-opener {
+        left: 8px;
+        top: 8px;
+        width: 40px;
+        height: 40px;
+    }
+}
