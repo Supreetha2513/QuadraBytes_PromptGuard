@@ -51,11 +51,11 @@ class UserProfiler:
             last_time_str = profile.get("last_prompt_time")
             if last_time_str:
                 last_time = datetime.fromisoformat(last_time_str)
-                if datetime.now() - last_time < timedelta(hours=1):
-                    remaining = timedelta(hours=1) - (datetime.now() - last_time)
+                if datetime.now() - last_time < timedelta(minutes=1):  # ← 1 minute for demo
+                    remaining = timedelta(minutes=1) - (datetime.now() - last_time)
                     mins = int(remaining.total_seconds() // 60)
                     secs = int(remaining.total_seconds() % 60)
-                    return f"⏳ RATE LIMITED (Playbook A): 1 prompt per hour. Try again in {mins}m {secs}s."
+                    return f"⏳ RATE LIMITED (Playbook A): 1 prompt per minute. Try again in {mins}m {secs}s."
 
         # Allow prompt and update last time
         profile["last_prompt_time"] = datetime.now().isoformat()
@@ -86,10 +86,10 @@ class UserProfiler:
             profile["score"] += 10
 
         # Update status and playbook
-        if profile["score"] >= 15:
+        if profile["score"] >= 30:
             profile["status"] = "HIGH_RISK"
             profile["banned"] = True  # Permanent ban
-        elif profile["score"] >= 6:
+        elif profile["score"] >= 12:
             profile["status"] = "MEDIUM_RISK"
         else:
             profile["status"] = "LOW_RISK"

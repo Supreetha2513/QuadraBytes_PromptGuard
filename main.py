@@ -105,7 +105,7 @@ while True:
     # -------------------------
     # LAYER 2: Intent-State Analyzer
     # -------------------------
-    l2_result = detect_intent(sanitized_input, threshold=0.55)
+    l2_result = detect_intent(sanitized_input, threshold=0.95)
 
     transaction_log.update({
         "layer2_score": l2_result["score"],
