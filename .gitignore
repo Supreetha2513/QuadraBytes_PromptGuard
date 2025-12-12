@@ -14,3 +14,7 @@ __pycache__/
 
 # IDE folders
 .vscode/
+
+models/onnx_cache/
+*.onnx
+*.lock
