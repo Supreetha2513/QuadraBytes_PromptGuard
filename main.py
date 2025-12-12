@@ -1,9 +1,15 @@
 # main.py
 from layer1.inversion_filter import InversionFilter
-from layer2 import detect_intent  # ONNX DeBERTa-v3 Layer 2
+from layer2 import detect_intent
 from layer3.mathematical_armor import MathematicalArmor
-from layer4 import filter_output    # Modular Layer 4
+from layer4 import filter_output
+from layer5 import enforce_playbook, update_user_score, get_user_status  # ← Add these
 import subprocess
+
+# -------------------------
+# User ID (for demo)
+# -------------------------
+USER_ID = "demo_user_01"  # Change or randomize per session if needed
 
 # -------------------------
 # Initialize Layers
@@ -11,13 +17,7 @@ import subprocess
 layer1 = InversionFilter()
 layer3 = MathematicalArmor(max_input_length=2000)
 
-# Layer 2 & 4 are functions (singletons), no init needed
-
-
 def run_llama(system_prompt: str, user_prompt: str) -> str:
-    """
-    Sends prompt to local Llama via Ollama (runs in WSL).
-    """
     cmd = ["ollama", "run", "llama3.2:1b"]
     full_prompt = f"{system_prompt}\n\nUser: {user_prompt}"
     cmd.append(full_prompt)
@@ -40,11 +40,10 @@ def run_llama(system_prompt: str, user_prompt: str) -> str:
 
     return result.stdout.strip()
 
-
 # -------------------------
 # Startup Message
 # -------------------------
-print("🔥 PromptGuard Kinetic Shield Active (Layer 1 + ONNX Layer 2 + Layer 3 + Layer 4)")
+print("🔥 PromptGuard Kinetic Shield Active (Layer 1–5: Full Zero-Trust)")
 print("Type your messages below. Type 'exit' or 'quit' to stop.\n")
 
 # -------------------------
@@ -62,7 +61,19 @@ while True:
         continue
 
     # -------------------------
-    # LAYER 1: Inversion Pre-Filter (Structural Sanitization)
+    # LAYER 5: Enforce Playbook FIRST (Rate limit / Ban)
+    # -------------------------
+    block_msg = enforce_playbook(USER_ID)
+    if block_msg:
+        print(f"\n🛑 {block_msg}")
+        status = get_user_status(USER_ID)
+        print(f"   Risk Level: {status['status']} | Sinner's Score: {status['score']}")
+        if status.get("banned"):
+            print("   This user is permanently banned.")
+        continue  # Skip everything else
+
+    # -------------------------
+    # LAYER 1: Inversion Pre-Filter
     # -------------------------
     l1_result = layer1.sanitize(user_input)
     sanitized_input = l1_result["sanitized_text"]
@@ -70,19 +81,21 @@ while True:
 
     if l1_flags:
         print(f"⚠️ LAYER 1: Suspicious patterns detected → {l1_flags}")
-        if sanitized_input != user_input:
-            print(f"   Sanitized: {sanitized_input!r}")
+        update_user_score(USER_ID, "probe")  # ← Score increase
     else:
         print("✓ LAYER 1: No structural issues detected.")
 
     # -------------------------
-    # LAYER 2: Intent-State Analyzer (ONNX DeBERTa-v3)
+    # LAYER 2: Intent-State Analyzer
     # -------------------------
     l2_result = detect_intent(sanitized_input, threshold=0.55)
 
     if l2_result["is_malicious"]:
         print(f"🛑 LAYER 2 BLOCKED: Malicious intent detected!")
-        print(f"   Confidence score: {l2_result['score']:.4f} | Label: {l2_result['label']}")
+        print(f"   Score: {l2_result['score']:.4f}")
+        update_user_score(USER_ID, "breach")  # ← Big score hit
+        status = get_user_status(USER_ID)
+        print(f"   → Sinner's Score updated: {status['score']} ({status['status']})")
         continue
     else:
         print(f"✓ LAYER 2: Safe intent (score: {l2_result['score']:.4f})")
@@ -95,44 +108,43 @@ while True:
         severity = "ATTACK"
     elif l2_result["score"] > 0.5 or l1_flags:
         severity = "SUSPICIOUS"
-
     print(f"→ Risk Level: {severity}")
 
     # -------------------------
     # LAYER 3: Mathematical Armoring
     # -------------------------
     armor_result = layer3.armor(sanitized_input, severity=severity)
-
     if not armor_result["is_armored"]:
-        print(f"🛑 LAYER 3 BLOCKED: {armor_result.get('error', 'Armoring failed')}")
+        print(f"🛑 LAYER 3 BLOCKED: Armoring failed")
+        update_user_score(USER_ID, "probe")
         continue
 
     system_message = armor_result["system_message"]
     armored_user_message = armor_result["user_message"]
     token_used = armor_result["token"]
-
-    print(f"✓ LAYER 3: {severity} armoring applied (defensive token: {token_used})")
+    print(f"✓ LAYER 3: {severity} armoring applied (token: {token_used})")
 
     # -------------------------
-    # Send to Ollama LLM (ONE TIME ONLY)
+    # Send to LLM
     # -------------------------
     print("\n🧠 Sending to LLM (armored prompt)...\n")
     raw_response = run_llama(system_message, armored_user_message)
 
     # -------------------------
-    # LAYER 4: Output Filtering (Egress Security)
+    # LAYER 4: Output Filtering
     # -------------------------
     filter_result = filter_output(raw_response)
-
     if not filter_result["safe"]:
         print("🛑 LAYER 4 BLOCKED OUTPUT:")
         for issue in filter_result["issues"]:
             print(f"   ⚠️ {issue}")
-        print("   Sensitive content redacted or blocked.")
+        print("   Sensitive content redacted.")
         final_output = filter_result["sanitized"][:500] + "\n\n[RESPONSE BLOCKED BY LAYER 4]"
+        update_user_score(USER_ID, "breach")  # ← Leak attempt = high risk
     else:
         print("✓ LAYER 4: Output verified safe.")
         final_output = raw_response
+        update_user_score(USER_ID, "normal")  # ← Good behavior
 
     print("\nMODEL:", final_output)
     print("\n" + "-" * 60)
