@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptGuard Studio - Protected Chat</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/chat.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-particles" id="bgParticles"></div>
+    
+    <div class="chat-container">
+        <!-- Left Sidebar - Chat History -->
+        <aside class="chat-sidebar" id="chatSidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h2>PromptGuard</h2>
+                        <p class="logo-subtitle">Protected Chat</p>
+                    </div>
+                </div>
+                <button class="sidebar-collapse-toggle" id="chatSidebarToggle" title="Minimize Sidebar">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+
+            <div class="chat-history">
+                <div class="section-title">
+                    <i class="fas fa-history"></i>
+                    <span>Recent Conversations</span>
+                </div>
+                <div class="history-list">
+                    <div class="history-item active">
+                        <div class="history-icon">
+                            <i class="fas fa-shield-halved"></i>
+                        </div>
+                        <div class="history-info">
+                            <span class="history-title">Security Test</span>
+                            <span class="history-time">Just now</span>
+                        </div>
+                    </div>
+                    <div class="history-item">
+                        <div class="history-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="history-info">
+                            <span class="history-title">Safe Content</span>
+                            <span class="history-time">1 hour ago</span>
+                        </div>
+                    </div>
+                    <div class="history-item">
+                        <div class="history-icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div class="history-info">
+                            <span class="history-title">Image Analysis</span>
+                            <span class="history-time">3 hours ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="model-info">
+                <div class="model-badge" id="modelTypeBadge">
+                    <div class="badge-icon">
+                        <i class="fas fa-keyboard"></i>
+                    </div>
+                    <span class="badge-text">Text Model</span>
+                </div>
+                <button class="btn btn-back" id="backToModelsBtn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Models</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-main">
+            <!-- Hamburger Toggle -->
+            <button class="hamburger-toggle" id="chatHamburger" title="Toggle Chat Sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <!-- Header -->
+            <header class="chat-header">
+                <div class="header-content">
+                    <h1>Protected LLM Chat</h1>
+                    <p class="header-subtitle">Real-time Security Monitoring</p>
+                </div>
+                <div class="header-stats">
+                    <div class="stat">
+                        <span class="stat-label">Status:</span>
+                        <span class="stat-value active">SECURE</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Layers:</span>
+                        <span class="stat-value">3/3</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Chat Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <div class="message system">
+                    <div class="message-avatar">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">PromptGuard System</span>
+                            <span class="message-time">Just now</span>
+                        </div>
+                        <div class="message-text">
+                            Welcome to PromptGuard protected chat. All interactions are monitored in real-time by our 3-phase security system. Try sending a prompt to see live backend security processing!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input-area">
+                <!-- Image Upload (for image model) -->
+                <div class="image-upload-container" id="imageUploadContainer" style="display: none;">
+                    <div class="upload-header">
+                        <span>Image Upload</span>
+                        <button class="btn btn-icon btn-small" id="removeImageBtn" style="display: none;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="upload-preview" id="uploadPreview">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Drop image or click to upload</span>
+                    </div>
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                </div>
+
+                <div class="input-container">
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Type your message here... (Try malicious prompts to see backend security layers in action)"
+                            rows="1"
+                            spellcheck="false"></textarea>
+                        <div class="input-controls">
+                            <button class="btn btn-icon" id="attachImageBtn" title="Attach image">
+                                <i class="fas fa-image"></i>
+                            </button>
+                            <button class="btn btn-send" id="sendMessageBtn">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Send</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="input-footer">
+                        <span class="security-note">
+                            <i class="fas fa-shield-alt"></i>
+                            All inputs processed through 3-phase security layers
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Panel - Security Visualization -->
+        <aside class="security-panel">
+            <!-- Panel Header -->
+            <div class="panel-header">
+                <div class="panel-title">
+                    <i class="fas fa-radar"></i>
+                    <h3>Backend Security Pipeline</h3>
+                </div>
+                <div class="panel-controls">
+                    <button class="btn btn-icon" id="checkAnalysisBtn" title="Detailed Analysis">
+                        <i class="fas fa-chart-network"></i>
+                    </button>
+                    <button class="btn btn-icon" id="pauseLogsBtn" title="Pause Updates">
+                        <i class="fas fa-pause"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Real-time Security Logs -->
+            <div class="security-logs-container">
+                <div class="logs-header">
+                    <span class="logs-title">Real-time Processing Logs</span>
+                    <span class="logs-status" id="logsStatus">LIVE</span>
+                </div>
+                <div class="security-logs" id="securityLogs">
+                    <div class="log-entry system">
+                        <div class="log-time">14:30:22</div>
+                        <div class="log-content">
+                            <span class="log-level">SYSTEM</span>
+                            <span class="log-message">Security pipeline initialized. All backend layers ready.</span>
+                        </div>
+                    </div>
+                    <div class="log-entry info">
+                        <div class="log-time">14:30:25</div>
+                        <div class="log-content">
+                            <span class="log-level">INFO</span>
+                            <span class="log-message">Waiting for user input to begin backend processing...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backend Flowchart Visualization -->
+            <div class="flowchart-container">
+                <div class="flowchart-header">
+                    <div style="display:flex;flex-direction:column;gap:6px;">
+                        <span class="flowchart-title">Backend Security Flow</span>
+                        <div id="flowProgress" class="flow-progress">Ready</div>
+                    </div>
+                    <span class="flowchart-status" id="flowchartStatus">IDLE</span>
+                </div>
+                
+                <!-- Real-time Flowchart - Compact Progress View -->
+                <div class="backend-flowchart">
+                    <div class="flowchart-diagram compact-flow">
+                        <!-- Layer 1 Progress -->
+                        <div class="layer-flow-item">
+                            <div class="layer-box" data-layer="1">
+                                <span class="layer-number">Layer 1</span>
+                                <span class="layer-name">Ingress Defense</span>
+                            </div>
+                            <span class="layer-status" id="stage1Status">waiting...</span>
+                        </div>
+
+                        <!-- Arrow -->
+                        <div class="layer-arrow">→</div>
+
+                        <!-- Layer 2 Progress -->
+                        <div class="layer-flow-item">
+                            <div class="layer-box" data-layer="2">
+                                <span class="layer-number">Layer 2</span>
+                                <span class="layer-name">Egress Defense</span>
+                            </div>
+                            <span class="layer-status" id="stage2Status">waiting...</span>
+                        </div>
+
+                        <!-- Arrow -->
+                        <div class="layer-arrow">→</div>
+
+                        <!-- Layer 3 Progress -->
+                        <div class="layer-flow-item">
+                            <div class="layer-box" data-layer="3">
+                                <span class="layer-number">Layer 3</span>
+                                <span class="layer-name">Governance</span>
+                            </div>
+                            <span class="layer-status" id="stage3Status">waiting...</span>
+                        </div>
+                    </div>
+                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Processing Timeline -->
+                <div class="processing-timeline">
+                    <div class="timeline-header">
+                        <span>Processing Timeline</span>
+                        <span class="timeline-duration" id="timelineDuration">00.00s</span>
+                    </div>
+                    <div class="timeline-track">
+                        <div class="timeline-segment" data-stage="1"></div>
+                        <div class="timeline-segment" data-stage="2"></div>
+                        <div class="timeline-segment" data-stage="3"></div>
+                    </div>
+                </div>
+            </div>
+
+                <!-- Final Verdict removed - analysis is available via the top-right Analysis button -->
+        </aside>
+    </div>
+
+    <!-- Analysis Modal (Will be injected by JavaScript) -->
+    <div id="analysisModalContainer"></div>
+
+    <script src="js/chat.js"></script>
+    <script src="js/analysis-modal.js"></script>
+</body>
+</html>
