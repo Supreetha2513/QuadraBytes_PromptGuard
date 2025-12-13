@@ -37,34 +37,8 @@
                     <i class="fas fa-history"></i>
                     <span>Recent Conversations</span>
                 </div>
-                <div class="history-list">
-                    <div class="history-item active">
-                        <div class="history-icon">
-                            <i class="fas fa-shield-halved"></i>
-                        </div>
-                        <div class="history-info">
-                            <span class="history-title">Security Test</span>
-                            <span class="history-time">Just now</span>
-                        </div>
-                    </div>
-                    <div class="history-item">
-                        <div class="history-icon">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="history-info">
-                            <span class="history-title">Safe Content</span>
-                            <span class="history-time">1 hour ago</span>
-                        </div>
-                    </div>
-                    <div class="history-item">
-                        <div class="history-icon">
-                            <i class="fas fa-image"></i>
-                        </div>
-                        <div class="history-info">
-                            <span class="history-title">Image Analysis</span>
-                            <span class="history-time">3 hours ago</span>
-                        </div>
-                    </div>
+                <div class="history-list" id="recentConversationsList">
+                    <!-- Populated dynamically. Starts empty on reload -->
                 </div>
             </div>
 
@@ -177,9 +151,10 @@
                     <i class="fas fa-radar"></i>
                     <h3>Backend Security Pipeline</h3>
                 </div>
-                <div class="panel-controls">
-                    <button class="btn btn-icon" id="checkAnalysisBtn" title="Detailed Analysis">
+                    <div class="panel-controls">
+                    <button class="btn btn-icon" id="checkAnalysisBtn" title="Show Analysis">
                         <i class="fas fa-chart-network"></i>
+                        <span class="btn-text">Show Analysis</span>
                     </button>
                     <button class="btn btn-icon" id="pauseLogsBtn" title="Pause Updates">
                         <i class="fas fa-pause"></i>
@@ -221,10 +196,10 @@
                     <span class="flowchart-status" id="flowchartStatus">IDLE</span>
                 </div>
                 
-                <!-- Real-time Flowchart - Compact Progress View -->
+                <!-- Real-time Flowchart - Compact Progress View (6 layers) -->
                 <div class="backend-flowchart">
-                    <div class="flowchart-diagram compact-flow">
-                        <!-- Layer 1 Progress -->
+                    <div class="flowchart-diagram compact-flow six-layers">
+                        <!-- Layer 1 -->
                         <div class="layer-flow-item">
                             <div class="layer-box" data-layer="1">
                                 <span class="layer-number">Layer 1</span>
@@ -232,29 +207,55 @@
                             </div>
                             <span class="layer-status" id="stage1Status">waiting...</span>
                         </div>
-
-                        <!-- Arrow -->
                         <div class="layer-arrow">→</div>
 
-                        <!-- Layer 2 Progress -->
+                        <!-- Layer 2 -->
                         <div class="layer-flow-item">
                             <div class="layer-box" data-layer="2">
                                 <span class="layer-number">Layer 2</span>
-                                <span class="layer-name">Egress Defense</span>
+                                <span class="layer-name">Intent Detection</span>
                             </div>
                             <span class="layer-status" id="stage2Status">waiting...</span>
                         </div>
-
-                        <!-- Arrow -->
                         <div class="layer-arrow">→</div>
 
-                        <!-- Layer 3 Progress -->
+                        <!-- Layer 3 -->
                         <div class="layer-flow-item">
                             <div class="layer-box" data-layer="3">
                                 <span class="layer-number">Layer 3</span>
-                                <span class="layer-name">Governance</span>
+                                <span class="layer-name">Mathematical Armor</span>
                             </div>
                             <span class="layer-status" id="stage3Status">waiting...</span>
+                        </div>
+                        <div class="layer-arrow">→</div>
+
+                        <!-- Layer 4 -->
+                        <div class="layer-flow-item">
+                            <div class="layer-box" data-layer="4">
+                                <span class="layer-number">Layer 4</span>
+                                <span class="layer-name">Output Filter</span>
+                            </div>
+                            <span class="layer-status" id="stage4Status">waiting...</span>
+                        </div>
+                        <div class="layer-arrow">→</div>
+
+                        <!-- Layer 5 -->
+                        <div class="layer-flow-item">
+                            <div class="layer-box" data-layer="5">
+                                <span class="layer-number">Layer 5</span>
+                                <span class="layer-name">Playbook Enforcement</span>
+                            </div>
+                            <span class="layer-status" id="stage5Status">waiting...</span>
+                        </div>
+                        <div class="layer-arrow">→</div>
+
+                        <!-- Layer 6 -->
+                        <div class="layer-flow-item">
+                            <div class="layer-box" data-layer="6">
+                                <span class="layer-number">Layer 6</span>
+                                <span class="layer-name">Forensic Logging</span>
+                            </div>
+                            <span class="layer-status" id="stage6Status">waiting...</span>
                         </div>
                     </div>
                 </div>
@@ -270,10 +271,13 @@
                         <span class="timeline-duration" id="timelineDuration">00.00s</span>
                     </div>
                     <div class="timeline-track">
-                        <div class="timeline-segment" data-stage="1"></div>
-                        <div class="timeline-segment" data-stage="2"></div>
-                        <div class="timeline-segment" data-stage="3"></div>
-                    </div>
+    <div class="timeline-segment" data-stage="1"></div>
+    <div class="timeline-segment" data-stage="2"></div>
+    <div class="timeline-segment" data-stage="3"></div>
+    <div class="timeline-segment" data-stage="4"></div>
+    <div class="timeline-segment" data-stage="5"></div>
+    <div class="timeline-segment" data-stage="6"></div>
+</div>
                 </div>
             </div>
 
@@ -285,6 +289,6 @@
     <div id="analysisModalContainer"></div>
 
     <script src="js/chat.js"></script>
-    <script src="js/analysis-modal.js"></script>
+    <script src="js/analysis-model.js"></script>
 </body>
 </html>

@@ -79,13 +79,22 @@ class IntentStateAnalyzer:
         }
 
 
-# Global singleton — loads once at import time
-analyzer = IntentStateAnalyzer()
+# Lazy-initialized singleton to avoid heavy imports at module load time
+# The model will be loaded on first use (safer for starting the Flask dev server)
+analyzer = None
+
+
+def _get_analyzer() -> IntentStateAnalyzer:
+    global analyzer
+    if analyzer is None:
+        analyzer = IntentStateAnalyzer()
+    return analyzer
 
 
 # Convenience function for other parts of the code
 def detect_intent(prompt: str, threshold: float = 0.7) -> Dict[str, Any]:
     """
     Main function to call from main.py or other layers
+    This will initialize the ONNX model on first call rather than at import time.
     """
-    return analyzer.analyze(prompt, threshold)
+    return _get_analyzer().analyze(prompt, threshold)
