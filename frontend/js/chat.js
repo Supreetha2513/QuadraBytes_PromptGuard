@@ -67,6 +67,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Load recent conversations from backend
+    function loadRecentConversations() {
+        const conversationsList = document.getElementById('recentConversationsList');
+        if (!conversationsList) return;
+
+        fetch('http://localhost:5000/api/conversations')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.conversations && data.conversations.length > 0) {
+                    conversationsList.innerHTML = '';
+                    data.conversations.forEach(conv => {
+                        const convEl = document.createElement('div');
+                        convEl.className = 'conversation-item';
+                        const timestamp = new Date(conv.timestamp).toLocaleTimeString([], { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                        });
+                        convEl.innerHTML = `
+                            <div class="conversation-preview">${conv.preview}</div>
+                            <div class="conversation-meta">${timestamp}</div>
+                        `;
+                        conversationsList.appendChild(convEl);
+                    });
+                } else {
+                    conversationsList.innerHTML = '<div class="placeholder-message">No recent conversations</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading conversations:', error);
+                conversationsList.innerHTML = '<div class="placeholder-message">Error loading conversations</div>';
+            });
+    }
+
     // Auto-resize textarea
     if (messageInput) {
         messageInput.addEventListener('input', function() {
@@ -74,6 +107,9 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.height = Math.min(this.scrollHeight, 200) + 'px';
         });
     }
+
+    // Load recent conversations on page load
+    loadRecentConversations();
 
     // Send message
     safeListen(sendMessageBtn, 'click', sendMessage);
@@ -151,6 +187,41 @@ document.addEventListener('DOMContentLoaded', function() {
         this.title = logsPaused ? 'Resume updates' : 'Pause updates';
     });
 
+    // Load recent conversations from backend
+    function loadRecentConversations() {
+        // Render local conversation history (starts empty on reload)
+        renderLocalHistory();
+    }
+
+    function renderLocalHistory() {
+        const conversationsList = document.getElementById('recentConversationsList');
+        if (!conversationsList) return;
+        conversationsList.innerHTML = '';
+        if (!conversationHistory || conversationHistory.length === 0) {
+            conversationsList.innerHTML = '<div class="placeholder-message">No recent conversations</div>';
+            return;
+        }
+
+        // Show last 8 messages grouped by session (simple UX: show recent messages)
+        const last = conversationHistory.slice(-8).reverse();
+        last.forEach(msg => {
+            const convItem = document.createElement('div');
+            convItem.className = 'conversation-item';
+            const timestamp = msg.timestamp || new Date().toLocaleTimeString();
+            convItem.innerHTML = `
+                <div class="conversation-preview">${msg.text}</div>
+                <div class="conversation-meta">${timestamp}</div>
+            `;
+            convItem.addEventListener('click', () => {
+                // Scroll chat to the first matching message
+                const allMsgs = Array.from(document.querySelectorAll('.message'));
+                const found = allMsgs.find(el => el.textContent.includes(msg.text));
+                if (found) found.scrollIntoView({behavior: 'smooth', block: 'center'});
+            });
+            conversationsList.appendChild(convItem);
+        });
+    }
+
     // Send message function
     function sendMessage() {
         const message = messageInput ? messageInput.value.trim() : '';
@@ -179,11 +250,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Start security visualization
         visualizeSecurityProcess(message);
 
-        // Simulate AI response after security processing
-        setTimeout(() => {
-            generateAIResponse(message);
-            isProcessing = false;
-        }, 2000);
+        // Send message to backend
+        processMessageWithBackend(message);
     }
 
     // Add message to chat
@@ -364,10 +432,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function createFlowchartMessages() {
+        // Messages will be populated from real backend logs
         flowchartMessages = {
-            stage1: ["Analyzing input structure...", "Scanning for injection patterns...", "Validating prompt format...", "Layer 1 security check passed ✓"],
-            stage2: ["Scanning output for content leakage...", "Checking entropy levels...", "Validating jailbreak protection...", "Layer 2 security check passed ✓"],
-            stage3: ["Applying governance rules...", "Risk scoring analysis...", "Generating security report...", "Layer 3 security check passed ✓"]
+            stage1: [],
+            stage2: [],
+            stage3: [],
+            stage4: [],
+            stage5: [],
+            stage6: []
         };
     }
 
@@ -725,6 +797,200 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // ===== BACKEND PROCESSING FUNCTION =====
+    function processMessageWithBackend(userMessage) {
+        // Send to backend API
+        fetch('http://localhost:5000/api/process', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: userMessage,
+                user_id: 'demo_user_01'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // --- START OF FIX ---
+                
+                // 1. Get the raw message
+                let cleanMessage = data.message;
+
+                // 2. Use Regex to strip <SEC_...> tags
+                // This regex looks for tags starting with SEC_ inside angle brackets and removes them
+                cleanMessage = cleanMessage.replace(/<SEC_[^>]+>/g, '');
+                
+                // 3. Clean up any leftover "MODEL:" prefix if it exists in the string
+                cleanMessage = cleanMessage.replace(/^MODEL:\s*/i, '');
+
+                // 4. Trim whitespace
+                cleanMessage = cleanMessage.trim();
+
+                // Add CLEANED AI response to chat
+                addMessageToChat('model', cleanMessage);
+
+                // --- END OF FIX ---
+                
+                // Render ordered summary and update flowchart from backend `layers`
+                if (data.layers) {
+                    renderLayerSummary(data.layers);
+                    renderFlowchart(data.layers);
+                }
+                
+                // Reload recent conversations to show the new message
+                loadRecentConversations();
+            } else {
+                // Handle blocked request
+                addMessageToChat('system', `⚠️ Request blocked: ${data.message}`);
+                addFlowchartLog('DANGER', data.message);
+                
+                // If blocked, still render summary/flowchart if available
+                if (data.layers) {
+                    renderLayerSummary(data.layers);
+                    renderFlowchart(data.layers);
+                }
+            }
+            
+            // Reload recent conversations
+            loadRecentConversations();
+            
+            isProcessing = false;
+            completeBackendProcessing();
+        })
+        .catch(error => {
+            console.error('Error processing message:', error);
+            addMessageToChat('system', `Error: ${error.message}`);
+            addFlowchartLog('ERROR', `Backend error: ${error.message}`);
+            isProcessing = false;
+        });
+    }
+
+    function processBackendLogs(logs) {
+        // Process each log entry and update the UI
+        logs.forEach((log, index) => {
+            setTimeout(() => {
+                addFlowchartLog(log.level, log.message);
+            }, index * 100);
+        });
+    }
+
+    // Render an ordered 1→6 summary in the security logs pane (only these entries)
+    function renderLayerSummary(layers) {
+        if (!securityLogs) return;
+        securityLogs.innerHTML = '';
+
+        const ordered = ['layer1','layer2','layer3','layer4','layer5','layer6'];
+        ordered.forEach((key, idx) => {
+            const layer = layers[key] || {};
+            const passed = !!layer.passed;
+            const level = passed ? 'info' : 'danger';
+            const time = new Date().toLocaleTimeString();
+            const message = layer.message || (passed ? 'Passed' : 'Blocked');
+
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${level}`;
+            entry.innerHTML = `
+                <div class="log-time">${time}</div>
+                <div class="log-content">
+                    <span class="log-level">L${idx+1}</span>
+                    <span class="log-message">Layer ${idx+1} (${key}): ${message}</span>
+                </div>`;
+            securityLogs.appendChild(entry);
+        });
+        securityLogs.scrollTop = securityLogs.scrollHeight;
+    }
+
+    // Update the flowchart DOM to reflect backend `layers` status
+    function renderFlowchart(layers) {
+        const ordered = ['layer1','layer2','layer3','layer4','layer5','layer6'];
+        let blockedAt = null;
+        ordered.forEach((key, idx) => {
+            const layerNum = idx + 1;
+            const passed = layers[key] && layers[key].passed;
+            const statusEl = document.getElementById(`stage${layerNum}Status`);
+            const box = document.querySelector(`.layer-box[data-layer="${layerNum}"]`);
+
+            if (statusEl) {
+                statusEl.textContent = passed ? 'done!' : 'error!';
+                statusEl.className = `layer-status ${passed ? 'done' : 'error'}`;
+            }
+            if (box) {
+                box.classList.remove('completed','error');
+                if (passed) box.classList.add('completed');
+                else box.classList.add('error');
+            }
+
+            if (!passed && blockedAt === null) blockedAt = layerNum;
+        });
+
+        // Update arrows active state
+        document.querySelectorAll('.layer-arrow').forEach((arrow, i) => {
+            const idx = i + 1;
+            if (!blockedAt || idx < blockedAt) arrow.classList.add('active');
+            else arrow.classList.remove('active');
+        });
+
+        // Update flow status and progress text
+        if (blockedAt) {
+            updateFlowchartStatus('blocked');
+            updateFlowProgressText(`Blocked at Layer ${blockedAt}`);
+            updateFinalVerdict('BLOCKED', `Stopped at layer ${blockedAt}`);
+        } else {
+            updateFlowchartStatus('complete');
+            updateFlowProgressText('All layers passed');
+            updateFinalVerdict('SAFE', 'All security checks passed');
+        }
+    }
+
+    function updateLayerInfo(layers) {
+        // Update layer status based on backend response
+        if (layers.layer1) {
+            const status = layers.layer1.passed ? 'done' : 'error';
+            updateLayerStatus('layer1', status, layers.layer1);
+        }
+        if (layers.layer2) {
+            const status = layers.layer2.passed ? 'done' : 'error';
+            updateLayerStatus('layer2', status, layers.layer2);
+        }
+        if (layers.layer3) {
+            const status = layers.layer3.passed ? 'done' : 'error';
+            updateLayerStatus('layer3', status, layers.layer3);
+        }
+        if (layers.layer4) {
+            const status = layers.layer4.passed ? 'done' : 'error';
+            updateLayerStatus('layer4', status, layers.layer4);
+        }
+        if (layers.layer5) {
+            const status = layers.layer5.passed ? 'done' : 'error';
+            updateLayerStatus('layer5', status, layers.layer5);
+        }
+        if (layers.layer6) {
+            const status = layers.layer6.passed ? 'done' : 'error';
+            updateLayerStatus('layer6', status, layers.layer6);
+        }
+    }
+
+    function updateLayerStatus(layerName, status, details) {
+        const statusElementId = `${layerName}Status`;
+        const layerElement = document.querySelector(`[data-layer="${layerName}"]`);
+        
+        const statusElement = document.getElementById(statusElementId);
+        if (statusElement) {
+            statusElement.textContent = status === 'done' ? 'done!' : 'error!';
+            statusElement.className = `layer-status ${status}`;
+        }
+        
+        if (layerElement) {
+            if (status === 'done') {
+                layerElement.classList.add('completed');
+            } else if (status === 'error') {
+                layerElement.classList.add('error');
+            }
+        }
+    }
+
     // History items click handlers (safe)
     document.querySelectorAll('.history-item').forEach(item => {
         item.addEventListener('click', function() {
@@ -806,6 +1072,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="analysis-row"><strong>Behavioral Patterns:</strong>
                     <ul id="behaviorList"><li>No data</li></ul>
                 </div>
+                <div class="analysis-row"><strong>Likely Intent:</strong>
+                    <p id="likelyIntent">N/A</p>
+                </div>
+                <div class="analysis-row"><strong>Recommended Actions:</strong>
+                    <ul id="recommendations"><li>None</li></ul>
+                </div>
+                <div class="analysis-row"><strong>Recent Prompts:</strong>
+                    <ul id="recentPrompts"><li>—</li></ul>
+                </div>
                 <div class="analysis-row"><strong>PromptGuard Summary:</strong>
                     <p id="pgSummary">No summary available</p>
                 </div>
@@ -819,6 +1094,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!analysisPanel) return;
         const riskEl = analysisPanel.querySelector('#riskScore');
         const behaviorList = analysisPanel.querySelector('#behaviorList');
+        const intentEl = analysisPanel.querySelector('#likelyIntent');
+        const recEl = analysisPanel.querySelector('#recommendations');
+        const recentEl = analysisPanel.querySelector('#recentPrompts');
         const summaryEl = analysisPanel.querySelector('#pgSummary');
 
         // Simple heuristic for risk score based on completed/done layers
@@ -845,6 +1123,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // PromptGuard summary: simple sentence
         if (summaryEl) summaryEl.textContent = `PromptGuard processed the input and applied ${patterns.size} automated protections.`;
+
+        // Likely intent heuristics (simple client-side approximations)
+        let likely = 'General inquiry';
+        const lastPrompt = (conversationHistory.length && conversationHistory[conversationHistory.length-1].text) || '';
+        const lp = lastPrompt.toLowerCase();
+        if (/how to|tutorial|steps|guide/.test(lp)) likely = 'Instructional / How-to';
+        else if (/password|secret|key|token|credential/.test(lp)) likely = 'Secrets / Sensitive access attempt';
+        else if (/ignore previous|jailbreak|bypass|override/.test(lp)) likely = 'Prompt injection / override attempt';
+        else if (/write code|create script|implement/.test(lp)) likely = 'Code generation';
+        else if (/translate|summarize|explain/.test(lp)) likely = 'Transformation / summarization';
+        if (intentEl) intentEl.textContent = likely;
+
+        // Recommendations based on patterns and intent
+        const recs = [];
+        if (likely.includes('Secrets')) recs.push('Redact high-entropy strings and halt.');
+        if (likely.includes('Prompt injection')) recs.push('Block and escalate to human review.');
+        if (patterns.has('Sanitization applied') || patterns.has('Sanitization applied'.toLowerCase())) recs.push('Sanitization applied automatically.');
+        if (recs.length === 0) recs.push('No immediate action required. Monitor and log.');
+        if (recEl) recEl.innerHTML = recs.map(r=>`<li>${r}</li>`).join('');
+
+        // Recent prompts list (up to 5)
+        const recentPrompts = conversationHistory.slice(-5).reverse().map(m => `<li>${m.sender === 'user' ? m.text : '[model] ' + m.text}</li>`);
+        if (recentEl) recentEl.innerHTML = recentPrompts.join('') || '<li>—</li>';
     }
 
     safeListen(checkAnalysisBtn, 'click', function() {
